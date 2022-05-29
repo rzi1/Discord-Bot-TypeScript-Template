@@ -1,5 +1,6 @@
 import { REST } from '@discordjs/rest';
 import { Options } from 'discord.js';
+import * as schedule from 'node-schedule';
 import { createRequire } from 'node:module';
 
 import { Button } from './buttons/index.js';
@@ -25,6 +26,18 @@ let Config = require('../config/config.json');
 let Logs = require('../lang/logs.json');
 
 async function start(): Promise<void> {
+    const job = schedule.scheduleJob(
+        {
+            rule: '42 * * * *',
+            tz: 'America/New_York',
+        },
+        () => {
+            console.log('Hello');
+        }
+    );
+
+    let nextTime = ((job.nextInvocation() as any).toDate() as Date).toISOString();
+
     // Client
     let client = new CustomClient({
         intents: Config.client.intents,
