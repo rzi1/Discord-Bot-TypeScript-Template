@@ -22,6 +22,8 @@ import { CommandRegistrationService, JobService, Logger } from './services/index
 import { Trigger } from './triggers/index.js';
 
 const require = createRequire(import.meta.url);
+let parser = require('cron-parser');
+
 let Config = require('../config/config.json');
 let Logs = require('../lang/logs.json');
 
@@ -32,11 +34,36 @@ async function start(): Promise<void> {
             tz: 'America/New_York',
         },
         () => {
+            // Don't want this to actually run
             console.log('Hello');
         }
     );
 
+    // Bugged typings
+    // Can only get 1 next execution, not multiple
     let nextTime = ((job.nextInvocation() as any).toDate() as Date).toISOString();
+
+    // No way to get next execution time?
+    // let task = cron.schedule(
+    //     '42 * * * *',
+    //     () => {
+    //         console.log('Running a job at 01:00 at America/Sao_Paulo timezone');
+    //     },
+    //     {
+    //         // Allows us to not actually run this
+    //         scheduled: false,
+    //         timezone: 'America/New_York',
+    //     }
+    // );
+
+    let interval = parser.parseExpression('0 * * * *', {
+        currentDate: new Date(),
+        tz: 'Europe/Athens',
+    });
+
+    console.log('Date: ', interval.next().toISOString());
+    console.log('Date: ', interval.next().toISOString());
+    console.log('Date: ', interval.next().toISOString());
 
     // Client
     let client = new CustomClient({
