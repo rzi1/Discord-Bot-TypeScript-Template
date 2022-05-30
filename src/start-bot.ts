@@ -26,7 +26,7 @@ const require = createRequire(import.meta.url);
 let Config = require('../config/config.json');
 let Logs = require('../lang/logs.json');
 
-async function start(): Promise<void>
+async function start(): Promise<void> {
     let interval = parser.parseExpression('0 * * * *', {
         currentDate: new Date(),
         tz: 'America/New_York',
