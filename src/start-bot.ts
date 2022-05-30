@@ -14,10 +14,12 @@ import {
     ReactionHandler,
     TriggerHandler,
 } from './events/index.js';
+import { SelectMenuHandler } from './events/select-menu-handler.js';
 import { CustomClient } from './extensions/index.js';
 import { Job } from './jobs/index.js';
 import { Bot } from './models/bot.js';
 import { Reaction } from './reactions/index.js';
+import { DeleteSelectMenu, SelectMenu } from './select-menus/index.js';
 import { CommandRegistrationService, JobService, Logger } from './services/index.js';
 import { Trigger } from './triggers/index.js';
 
@@ -62,6 +64,9 @@ async function start(): Promise<void> {
         // TODO: Add new buttons here
     ];
 
+    // Select Menus
+    let selectMenus: SelectMenu[] = [new DeleteSelectMenu()];
+
     // Reactions
     let reactions: Reaction[] = [
         // TODO: Add new reactions here
@@ -77,6 +82,7 @@ async function start(): Promise<void> {
     let guildLeaveHandler = new GuildLeaveHandler();
     let commandHandler = new CommandHandler(commands);
     let buttonHandler = new ButtonHandler(buttons);
+    let selectMenuHandler = new SelectMenuHandler(selectMenus);
     let triggerHandler = new TriggerHandler(triggers);
     let messageHandler = new MessageHandler(triggerHandler);
     let reactionHandler = new ReactionHandler(reactions);
@@ -95,6 +101,7 @@ async function start(): Promise<void> {
         messageHandler,
         commandHandler,
         buttonHandler,
+        selectMenuHandler,
         reactionHandler,
         new JobService(jobs)
     );

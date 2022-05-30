@@ -6,7 +6,7 @@ import { ButtonDeferType } from './button.js';
 import { Button } from './index.js';
 
 export class DeleteBtn implements Button {
-    public ids = ['delete_cards'];
+    public ids = ['btn:delete_cards'];
     public deferType = ButtonDeferType.NONE;
     public requireGuild = true;
     public requireEmbedAuthorTag = false;
@@ -26,7 +26,7 @@ export class DeleteBtn implements Button {
                         components: [
                             {
                                 type: 'SELECT_MENU',
-                                customId: 'delete_cards_selection',
+                                customId: 'sm:delete_cards',
                                 minValues: 1,
                                 maxValues: 5,
                                 options: [
