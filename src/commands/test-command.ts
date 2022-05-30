@@ -19,6 +19,22 @@ export class TestCommand implements Command {
     public requireClientPerms: PermissionString[] = [];
 
     public async execute(intr: CommandInteraction, data: EventData): Promise<void> {
-        await InteractionUtils.send(intr, Lang.getEmbed('displayEmbeds.test', data.lang()));
+        await InteractionUtils.send(intr, {
+            embeds: [Lang.getEmbed('displayEmbeds.test', data.lang())],
+            components: [
+                {
+                    type: 'ACTION_ROW',
+                    components: [
+                        {
+                            type: 'BUTTON',
+                            customId: 'delete_cards',
+                            emoji: '❌',
+                            label: 'Delete',
+                            style: 'SECONDARY',
+                        },
+                    ],
+                },
+            ],
+        });
     }
 }

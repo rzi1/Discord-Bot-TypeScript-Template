@@ -3,7 +3,7 @@ import parser from 'cron-parser';
 import { Options } from 'discord.js';
 import { createRequire } from 'node:module';
 
-import { Button } from './buttons/index.js';
+import { Button, DeleteBtn } from './buttons/index.js';
 import { Command, HelpCommand, InfoCommand, TestCommand } from './commands/index.js';
 import {
     ButtonHandler,
@@ -58,6 +58,7 @@ async function start(): Promise<void> {
 
     // Buttons
     let buttons: Button[] = [
+        new DeleteBtn(),
         // TODO: Add new buttons here
     ];
 
