@@ -1,6 +1,5 @@
 import { RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { CommandInteraction, PermissionString } from 'discord.js';
-import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { EventData } from '../models/internal-models.js';
 import { Lang } from '../services/index.js';
@@ -14,7 +13,6 @@ export class TestCommand implements Command {
         dm_permission: true,
         default_member_permissions: undefined,
     };
-    public cooldown = new RateLimiter(1, 5000);
     public deferType = CommandDeferType.HIDDEN;
     public requireClientPerms: PermissionString[] = [];
 
