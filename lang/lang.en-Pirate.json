@@ -38,13 +38,28 @@
                     }
                 ]
             },
+            "faq": {
+                "title": "{{COM:bot.name}} - FAQ",
+                "description": [
+                    "Frequently Asked Questions about {{COM:bot.name}}.",
+                    "",
+                    "**How do I restrict who can run the commands?**",
+                    "Slash command permissions can be configured in the Server Settings. See \"/{{COM:chatCommands.help}} {{COM:arguments.option}}:Permissions\" for more information."
+                ],
+                "fields": [
+                    {
+                        "name": "{{REF:fields.links}}",
+                        "value": ["{{REF:links.docsEmbed}}", "{{REF:links.supportEmbed}}"]
+                    }
+                ]
+            },
             "test": {
                 "description": "Test command works!"
             },
-            "viewJoinDate": {
-                "description": "{{TARGET}}'s maiden voyage was on {{DATE}}!"
+            "viewDateJoined": {
+                "description": "{{TARGET}} joined on {{DATE}}!"
             },
-            "viewSentDate": {
+            "viewDateSent": {
                 "description": "This message was sent on {{DATE}}!"
             },
             "about": {
@@ -157,6 +172,10 @@
             "startupInProcess": {
                 "description": "{{COM:bot.name}} is still starting up. Try again later.",
                 "color": "{{COM:colors.warning}}"
+            },
+            "notImplemented": {
+                "description": "This feature has not been implemented yet!",
+                "color": "{{COM:colors.warning}}"
             }
         },
         "metaRegexes": {
@@ -177,12 +196,9 @@
             "description": "{{REF:links.templateEmbed}} helps give developers a starting point for new Discord bots, so that much of the initial setup can be avoided and developers can instead focus on meaningful bot features."
         },
         "commandDescs": {
-            "dev": "View developer info.",
-            "help": "View help menu and list of commands.",
+            "help": "Get help with commands, permissions, FAQ, etc.",
             "info": "View bot info.",
-            "link": "Get links to invite, support, etc.",
-            "test": "Run the test command.",
-            "translate": "View translation info."
+            "test": "Run the test command."
         },
         "lists": {
             "languageItem": "**{{LANGUAGE_NAME}}** (`{{LANGUAGE_KEYWORD}}`)"
