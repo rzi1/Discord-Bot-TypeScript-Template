@@ -1,5 +1,4 @@
 import {
-    ApplicationCommandOptionType,
     ApplicationCommandType,
     RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from 'discord-api-types/v10';
@@ -9,7 +8,8 @@ import { createRequire } from 'node:module';
 import os from 'node:os';
 import typescript from 'typescript';
 
-import { InfoOption, LangCode } from '../../enums/index.js';
+import { ChatArgs } from '../../constants/index.js';
+import { InfoOption } from '../../enums/index.js';
 import { Language } from '../../models/enum-helpers/index.js';
 import { EventData } from '../../models/internal-models.js';
 import { Lang } from '../../services/index.js';
@@ -23,30 +23,16 @@ let TsConfig = require('../../../tsconfig.json');
 export class InfoCommand implements Command {
     public metadata: RESTPostAPIChatInputApplicationCommandsJSONBody = {
         type: ApplicationCommandType.ChatInput,
-        name: Lang.getCom('chatCommands.info'),
-        description: Lang.getRef('commandDescs.info', Lang.Default),
+        name: Lang.getRef('chatCommands.info', Language.Default),
+        name_localizations: Lang.getRefLocalizationMap('chatCommands.info'),
+        description: Lang.getRef('commandDescs.info', Language.Default),
+        description_localizations: Lang.getRefLocalizationMap('commandDescs.info'),
         dm_permission: true,
         default_member_permissions: undefined,
         options: [
             {
-                name: Lang.getCom('arguments.option'),
-                description: 'Option.',
+                ...ChatArgs.INFO_OPTION,
                 required: true,
-                type: ApplicationCommandOptionType.String,
-                choices: [
-                    {
-                        name: Lang.getRef('infoOptions.about', Lang.Default),
-                        value: InfoOption.ABOUT,
-                    },
-                    {
-                        name: Lang.getRef('infoOptions.translate', Lang.Default),
-                        value: InfoOption.TRANSLATE,
-                    },
-                    {
-                        name: Lang.getRef('infoOptions.dev', Lang.Default),
-                        value: InfoOption.DEV,
-                    },
-                ],
             },
         ],
     };
@@ -54,21 +40,21 @@ export class InfoCommand implements Command {
     public requireClientPerms: PermissionString[] = [];
 
     public async execute(intr: CommandInteraction, data: EventData): Promise<void> {
-        let option = intr.options.getString(Lang.getCom('arguments.option'));
+        let option = intr.options.getString(Lang.getRef('arguments.option', Language.Default));
 
         let embed: MessageEmbed;
         switch (option) {
             case InfoOption.ABOUT: {
-                embed = Lang.getEmbed('displayEmbeds.about', data.lang());
+                embed = Lang.getEmbed('displayEmbeds.about', data.lang);
                 break;
             }
             case InfoOption.TRANSLATE: {
-                embed = Lang.getEmbed('displayEmbeds.translate', data.lang());
-                for (let langCode of Object.values(LangCode)) {
+                embed = Lang.getEmbed('displayEmbeds.translate', data.lang);
+                for (let langCode of Language.Enabled) {
                     embed.addFields([
                         {
-                            name: Language.displayName(langCode),
-                            value: Language.translators(langCode),
+                            name: Language.Data[langCode].nativeName,
+                            value: Lang.getRef('meta.translators', langCode),
                         },
                     ]);
                 }
@@ -78,7 +64,7 @@ export class InfoCommand implements Command {
                 if (!Config.developers.includes(intr.user.id)) {
                     await InteractionUtils.send(
                         intr,
-                        Lang.getEmbed('validationEmbeds.devOnly', data.lang())
+                        Lang.getEmbed('validationEmbeds.devOnly', data.lang)
                     );
                     return;
                 }
@@ -93,7 +79,7 @@ export class InfoCommand implements Command {
                         if (error.name.includes('SHARDING_IN_PROCESS')) {
                             await InteractionUtils.send(
                                 intr,
-                                Lang.getEmbed('errorEmbeds.startupInProcess', data.lang())
+                                Lang.getEmbed('errorEmbeds.startupInProcess', data.lang)
                             );
                             return;
                         } else {
@@ -105,7 +91,7 @@ export class InfoCommand implements Command {
                 }
 
                 let memory = process.memoryUsage();
-                embed = Lang.getEmbed('displayEmbeds.dev', data.lang(), {
+                embed = Lang.getEmbed('displayEmbeds.dev', data.lang, {
                     NODE_VERSION: process.version,
                     TS_VERSION: `v${typescript.version}`,
                     ES_VERSION: TsConfig.compilerOptions.target,
@@ -117,20 +103,20 @@ export class InfoCommand implements Command {
                     RSS_SIZE_PER_SERVER:
                         serverCount > 0
                             ? fileSize(memory.rss / serverCount)
-                            : Lang.getRef('other.na', data.lang()),
+                            : Lang.getRef('other.na', data.lang),
                     HEAP_TOTAL_SIZE: fileSize(memory.heapTotal),
                     HEAP_TOTAL_SIZE_PER_SERVER:
                         serverCount > 0
                             ? fileSize(memory.heapTotal / serverCount)
-                            : Lang.getRef('other.na', data.lang()),
+                            : Lang.getRef('other.na', data.lang),
                     HEAP_USED_SIZE: fileSize(memory.heapUsed),
                     HEAP_USED_SIZE_PER_SERVER:
                         serverCount > 0
                             ? fileSize(memory.heapUsed / serverCount)
-                            : Lang.getRef('other.na', data.lang()),
+                            : Lang.getRef('other.na', data.lang),
                     HOSTNAME: os.hostname(),
                     SHARD_ID: (intr.guild?.shardId ?? 0).toString(),
-                    SERVER_ID: intr.guild?.id ?? Lang.getRef('other.na', data.lang()),
+                    SERVER_ID: intr.guild?.id ?? Lang.getRef('other.na', data.lang),
                     BOT_ID: intr.client.user?.id,
                     USER_ID: intr.user.id,
                 });

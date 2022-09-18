@@ -1,14 +1,12 @@
-import { LangCode } from '../enums/index.js';
-import { Lang } from '../services/index.js';
+import { Locale } from 'discord-api-types/v10';
 
 // This class is used to store and pass data along in events
 export class EventData {
-    constructor() {
-        // TODO: Pass in event data (e.g. server and user data) from constructor
-    }
-
-    public lang(): LangCode {
-        // TODO: Calculate language based on event data
-        return Lang.Default;
-    }
+    // TODO: Add any data you want to store
+    constructor(
+        // Event language
+        public lang: Locale,
+        // Guild language
+        public langGuild: Locale
+    ) {}
 }

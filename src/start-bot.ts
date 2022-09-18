@@ -3,7 +3,7 @@ import parser from 'cron-parser';
 import { Options } from 'discord.js';
 import { createRequire } from 'node:module';
 
-import { Button, DeleteBtn } from './buttons/index.js';
+import { Button } from './buttons/index.js';
 import { HelpCommand, InfoCommand, TestCommand } from './commands/chat/index.js';
 import { Command } from './commands/command.js';
 import { ViewDateSent } from './commands/message/index.js';
@@ -17,13 +17,16 @@ import {
     ReactionHandler,
     TriggerHandler,
 } from './events/index.js';
-import { SelectMenuHandler } from './events/select-menu-handler.js';
 import { CustomClient } from './extensions/index.js';
 import { Job } from './jobs/index.js';
 import { Bot } from './models/bot.js';
 import { Reaction } from './reactions/index.js';
-import { DeleteSelectMenu, SelectMenu } from './select-menus/index.js';
-import { CommandRegistrationService, JobService, Logger } from './services/index.js';
+import {
+    CommandRegistrationService,
+    EventDataService,
+    JobService,
+    Logger,
+} from './services/index.js';
 import { Trigger } from './triggers/index.js';
 
 const require = createRequire(import.meta.url);
@@ -40,6 +43,9 @@ async function start(): Promise<void> {
     console.log('Date: ', interval.next().toISOString());
     console.log('Date: ', interval.next().toISOString());
     console.log('Date: ', interval.next().toISOString());
+
+    // Services
+    let eventDataService = new EventDataService();
 
     // Client
     let client = new CustomClient({
@@ -68,12 +74,8 @@ async function start(): Promise<void> {
 
     // Buttons
     let buttons: Button[] = [
-        new DeleteBtn(),
         // TODO: Add new buttons here
     ];
-
-    // Select Menus
-    let selectMenus: SelectMenu[] = [new DeleteSelectMenu()];
 
     // Reactions
     let reactions: Reaction[] = [
@@ -86,14 +88,13 @@ async function start(): Promise<void> {
     ];
 
     // Event handlers
-    let guildJoinHandler = new GuildJoinHandler();
+    let guildJoinHandler = new GuildJoinHandler(eventDataService);
     let guildLeaveHandler = new GuildLeaveHandler();
-    let commandHandler = new CommandHandler(commands);
-    let buttonHandler = new ButtonHandler(buttons);
-    let selectMenuHandler = new SelectMenuHandler(selectMenus);
-    let triggerHandler = new TriggerHandler(triggers);
+    let commandHandler = new CommandHandler(commands, eventDataService);
+    let buttonHandler = new ButtonHandler(buttons, eventDataService);
+    let triggerHandler = new TriggerHandler(triggers, eventDataService);
     let messageHandler = new MessageHandler(triggerHandler);
-    let reactionHandler = new ReactionHandler(reactions);
+    let reactionHandler = new ReactionHandler(reactions, eventDataService);
 
     // Jobs
     let jobs: Job[] = [
@@ -109,7 +110,6 @@ async function start(): Promise<void> {
         messageHandler,
         commandHandler,
         buttonHandler,
-        selectMenuHandler,
         reactionHandler,
         new JobService(jobs)
     );

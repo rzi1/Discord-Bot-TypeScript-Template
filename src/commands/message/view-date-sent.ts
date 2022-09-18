@@ -6,6 +6,7 @@ import { Message, MessageContextMenuInteraction, PermissionString } from 'discor
 import { RateLimiter } from 'discord.js-rate-limiter';
 import { DateTime } from 'luxon';
 
+import { Language } from '../../models/enum-helpers/index.js';
 import { EventData } from '../../models/internal-models.js';
 import { Lang } from '../../services/index.js';
 import { InteractionUtils } from '../../utils/index.js';
@@ -14,7 +15,8 @@ import { Command, CommandDeferType } from '../index.js';
 export class ViewDateSent implements Command {
     public metadata: RESTPostAPIContextMenuApplicationCommandsJSONBody = {
         type: ApplicationCommandType.Message,
-        name: Lang.getCom('messageCommands.viewDateSent'),
+        name: Lang.getRef('messageCommands.viewDateSent', Language.Default),
+        name_localizations: Lang.getRefLocalizationMap('messageCommands.viewDateSent'),
         default_member_permissions: undefined,
         dm_permission: true,
     };
@@ -25,7 +27,7 @@ export class ViewDateSent implements Command {
     public async execute(intr: MessageContextMenuInteraction, data: EventData): Promise<void> {
         await InteractionUtils.send(
             intr,
-            Lang.getEmbed('displayEmbeds.viewDateSent', data.lang(), {
+            Lang.getEmbed('displayEmbeds.viewDateSent', data.lang, {
                 DATE: DateTime.fromJSDate((intr.targetMessage as Message).createdAt).toLocaleString(
                     DateTime.DATE_HUGE
                 ),

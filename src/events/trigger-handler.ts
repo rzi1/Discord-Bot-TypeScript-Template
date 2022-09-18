@@ -2,7 +2,7 @@ import { Message } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import { createRequire } from 'node:module';
 
-import { EventData } from '../models/internal-models.js';
+import { EventDataService } from '../services/index.js';
 import { Trigger } from '../triggers/index.js';
 
 const require = createRequire(import.meta.url);
@@ -14,7 +14,7 @@ export class TriggerHandler {
         Config.rateLimiting.triggers.interval * 1000
     );
 
-    constructor(private triggers: Trigger[]) {}
+    constructor(private triggers: Trigger[], private eventDataService: EventDataService) {}
 
     public async process(msg: Message): Promise<void> {
         // Check if user is rate limited
@@ -41,8 +41,12 @@ export class TriggerHandler {
             return;
         }
 
-        // TODO: Get data from database
-        let data = new EventData();
+        // Get data from database
+        let data = await this.eventDataService.create({
+            user: msg.author,
+            channel: msg.channel,
+            guild: msg.guild,
+        });
 
         // Execute triggers
         for (let trigger of triggers) {

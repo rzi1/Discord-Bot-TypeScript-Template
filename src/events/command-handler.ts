@@ -1,10 +1,16 @@
-import { BaseCommandInteraction, NewsChannel, TextChannel, ThreadChannel } from 'discord.js';
+import {
+    AutocompleteInteraction,
+    BaseCommandInteraction,
+    NewsChannel,
+    TextChannel,
+    ThreadChannel,
+} from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 import { createRequire } from 'node:module';
 
 import { Command, CommandDeferType } from '../commands/index.js';
 import { EventData } from '../models/internal-models.js';
-import { Lang, Logger } from '../services/index.js';
+import { EventDataService, Lang, Logger } from '../services/index.js';
 import { CommandUtils, InteractionUtils } from '../utils/index.js';
 import { EventHandler } from './index.js';
 
@@ -18,17 +24,11 @@ export class CommandHandler implements EventHandler {
         Config.rateLimiting.commands.interval * 1000
     );
 
-    constructor(public commands: Command[]) {}
+    constructor(public commands: Command[], private eventDataService: EventDataService) {}
 
-    public async process(intr: BaseCommandInteraction): Promise<void> {
+    public async process(intr: BaseCommandInteraction | AutocompleteInteraction): Promise<void> {
         // Don't respond to self, or other bots
         if (intr.user.id === intr.client.user?.id || intr.user.bot) {
-            return;
-        }
-
-        // Check if user is rate limited
-        let limited = this.rateLimiter.take(intr.user.id);
-        if (limited) {
             return;
         }
 
@@ -40,6 +40,54 @@ export class CommandHandler implements EventHandler {
                     .replaceAll('{INTERACTION_ID}', intr.id)
                     .replaceAll('{COMMAND_NAME}', intr.commandName)
             );
+            return;
+        }
+
+        if (intr instanceof AutocompleteInteraction) {
+            let option = intr.options.getFocused(true);
+
+            if (!command.autocomplete) {
+                Logger.error(
+                    Logs.error.autocompleteNotFound
+                        .replaceAll('{INTERACTION_ID}', intr.id)
+                        .replaceAll('{COMMAND_NAME}', intr.commandName)
+                        .replaceAll('{OPTION_NAME}', option.name)
+                );
+                return;
+            }
+
+            try {
+                await command.autocomplete(intr, option);
+            } catch (error) {
+                Logger.error(
+                    intr.channel instanceof TextChannel ||
+                        intr.channel instanceof NewsChannel ||
+                        intr.channel instanceof ThreadChannel
+                        ? Logs.error.autocompleteGuild
+                              .replaceAll('{INTERACTION_ID}', intr.id)
+                              .replaceAll('{COMMAND_NAME}', command.metadata.name)
+                              .replaceAll('{OPTION_NAME}', option.name)
+                              .replaceAll('{USER_TAG}', intr.user.tag)
+                              .replaceAll('{USER_ID}', intr.user.id)
+                              .replaceAll('{CHANNEL_NAME}', intr.channel.name)
+                              .replaceAll('{CHANNEL_ID}', intr.channel.id)
+                              .replaceAll('{GUILD_NAME}', intr.guild?.name)
+                              .replaceAll('{GUILD_ID}', intr.guild?.id)
+                        : Logs.error.autocompleteOther
+                              .replaceAll('{INTERACTION_ID}', intr.id)
+                              .replaceAll('{COMMAND_NAME}', command.metadata.name)
+                              .replaceAll('{OPTION_NAME}', option.name)
+                              .replaceAll('{USER_TAG}', intr.user.tag)
+                              .replaceAll('{USER_ID}', intr.user.id),
+                    error
+                );
+            }
+            return;
+        }
+
+        // Check if user is rate limited
+        let limited = this.rateLimiter.take(intr.user.id);
+        if (limited) {
             return;
         }
 
@@ -61,8 +109,12 @@ export class CommandHandler implements EventHandler {
             return;
         }
 
-        // TODO: Get data from database
-        let data = new EventData();
+        // Get data from database
+        let data = await this.eventDataService.create({
+            user: intr.user,
+            channel: intr.channel,
+            guild: intr.guild,
+        });
 
         try {
             // Check if interaction passes command checks
@@ -102,9 +154,9 @@ export class CommandHandler implements EventHandler {
         try {
             await InteractionUtils.send(
                 intr,
-                Lang.getEmbed('errorEmbeds.command', data.lang(), {
+                Lang.getEmbed('errorEmbeds.command', data.lang, {
                     ERROR_CODE: intr.id,
-                    GUILD_ID: intr.guild?.id ?? Lang.getRef('other.na', data.lang()),
+                    GUILD_ID: intr.guild?.id ?? Lang.getRef('other.na', data.lang),
                     SHARD_ID: (intr.guild?.shardId ?? 0).toString(),
                 })
             );
