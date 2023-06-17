@@ -55,7 +55,7 @@
                 "description": "Test command works!"
             },
             "cleanup": {
-                "description": "Will now start cleaning up messages in this channel containing '{{FILTER}}' every {{INTERVAL}} seconds"
+                "description": "Will now start cleaning up messages in this channel containing '{{FILTER}}' every {{INTERVAL}} seconds starting in {{INTERVAL}} seconds -- Delete this message to cancel"
             },
             "viewDateJoined": {
                 "description": "{{TARGET}} joined on {{DATE}}!"
