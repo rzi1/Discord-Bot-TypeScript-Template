@@ -50,6 +50,25 @@ export const ChatCommandMetadata: {
         dm_permission: true,
         default_member_permissions: undefined,
     },
+    CLEANUP: {
+        type: ApplicationCommandType.ChatInput,
+        name: Lang.getRef('chatCommands.cleanup', Language.Default),
+        name_localizations: Lang.getRefLocalizationMap('chatCommands.cleanup'),
+        description: Lang.getRef('commandDescs.cleanup', Language.Default),
+        description_localizations: Lang.getRefLocalizationMap('commandDescs.cleanup'),
+        dm_permission: true,
+        default_member_permissions: undefined,
+        options: [
+            {
+                ...Args.FILTER_OPTION,
+                required: true,
+            },
+            {
+                ...Args.INTERVAL_OPTION,
+                required: true,
+            },
+        ],
+    },
 };
 
 export const MessageCommandMetadata: {

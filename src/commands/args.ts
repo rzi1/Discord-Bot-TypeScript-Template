@@ -24,6 +24,20 @@ export class Args {
             },
         ],
     };
+    public static readonly FILTER_OPTION: APIApplicationCommandBasicOption = {
+        name: Lang.getRef('arguments.filter', Language.Default),
+        name_localizations: Lang.getRefLocalizationMap('arguments.filter'),
+        description: Lang.getRef('argDescs.filterOption', Language.Default),
+        description_localizations: Lang.getRefLocalizationMap('argDescs.filterOption'),
+        type: ApplicationCommandOptionType.String,
+    };
+    public static readonly INTERVAL_OPTION: APIApplicationCommandBasicOption = {
+        name: Lang.getRef('arguments.interval', Language.Default),
+        name_localizations: Lang.getRefLocalizationMap('arguments.interval'),
+        description: Lang.getRef('argDescs.intervalOption', Language.Default),
+        description_localizations: Lang.getRefLocalizationMap('argDescs.intervalOption'),
+        type: ApplicationCommandOptionType.Integer,
+    };
     public static readonly INFO_OPTION: APIApplicationCommandBasicOption = {
         name: Lang.getRef('arguments.option', Language.Default),
         name_localizations: Lang.getRefLocalizationMap('arguments.option'),

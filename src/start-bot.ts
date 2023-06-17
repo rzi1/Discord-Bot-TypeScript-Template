@@ -3,7 +3,7 @@ import { Options, Partials } from 'discord.js';
 import { createRequire } from 'node:module';
 
 import { Button } from './buttons/index.js';
-import { HelpCommand, InfoCommand, TestCommand } from './commands/chat/index.js';
+import { CleanupCommand, HelpCommand, InfoCommand, TestCommand } from './commands/chat/index.js';
 import {
     ChatCommandMetadata,
     Command,
@@ -52,14 +52,14 @@ async function start(): Promise<void> {
             ...Config.client.caches,
         }),
     });
-
+    let cleanup = false;
     // Commands
     let commands: Command[] = [
         // Chat Commands
         new HelpCommand(),
         new InfoCommand(),
         new TestCommand(),
-
+        new CleanupCommand(),
         // Message Context Commands
         new ViewDateSent(),
 

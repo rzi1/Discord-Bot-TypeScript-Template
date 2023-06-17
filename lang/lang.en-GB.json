@@ -190,7 +190,8 @@
         "chatCommands": {
             "help": "help",
             "info": "info",
-            "test": "test"
+            "test": "test",
+            "cleanup": "cleanup"
         },
         "userCommands": {
             "viewDateJoined": "View Date Joined"
@@ -204,7 +205,8 @@
         "commandDescs": {
             "help": "Find help or contact support.",
             "info": "View bot info.",
-            "test": "Run the test command."
+            "test": "Run the test command.",
+            "cleanup": "cleanup"
         },
         "argDescs": {
             "helpOption": "Option.",
